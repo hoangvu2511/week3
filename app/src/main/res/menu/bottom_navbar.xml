@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:icon="@drawable/ic_action_comment"
+        android:id="@+id/cmt"
+        android:title=""/>
+    <item android:icon="@drawable/ic_action_retweet"
+        android:id="@+id/retwt"
+        android:title=""
+        />
+    <item android:icon="@drawable/heart"
+        android:id="@+id/heart"
+        android:title=""/>
+    <item android:icon="@drawable/ic_action_share"
+        android:id="@+id/shr"
+        android:title=""/>
+</menu>
