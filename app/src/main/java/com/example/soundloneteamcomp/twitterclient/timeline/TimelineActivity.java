@@ -11,6 +11,7 @@ import com.example.soundloneteamcomp.twitterclient.R;
 import com.example.soundloneteamcomp.twitterclient.adapter.EndlessRecyclerViewScrollListener;
 import com.example.soundloneteamcomp.twitterclient.adapter.TimelineComplexAdapter;
 import com.example.soundloneteamcomp.twitterclient.compose.ComposeTweetActivity;
+import com.example.soundloneteamcomp.twitterclient.model.TweetModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.models.Tweet;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -74,22 +76,34 @@ public class TimelineActivity extends AppCompatActivity implements TimelineContr
     }
 
     @Override
+    public void onUpdateTweet(Tweet tweet, int position) {
+        adapter.replaceData(tweet,position);
+    }
+
+    @Override
     public void showError(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     public void setRecyclerView(){
-        adapter = new TimelineComplexAdapter(this);
+        adapter = new TimelineComplexAdapter(this,presenter);
+        adapter.setListener(new TimelineComplexAdapter.ItemClickListener() {
+            @Override
+            public void onItemClick(TweetModel item) {
+                FragmentManager manager = getSupportFragmentManager();
+            }
+        });
+
         LinearLayoutManager manager = new LinearLayoutManager(this);
         rvTimeline.setLayoutManager(manager);
         rvTimeline.setAdapter(adapter);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(false);
                 presenter.start();
             }
         });
-        swipeRefreshLayout.setRefreshing(false);
         swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
@@ -106,4 +120,6 @@ public class TimelineActivity extends AppCompatActivity implements TimelineContr
         };
         rvTimeline.addOnScrollListener(scrollListener);
     }
+
+
 }

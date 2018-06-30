@@ -65,4 +65,72 @@ public class TimelinePresenter implements TimelineContract.Presenter {
                     }
                 });
     }
+
+    @Override
+    public void updateRetweet(long id,int position){
+        client.getStatusesService()
+                .retweet(id,null).enqueue(new Callback<Tweet>() {
+            @Override
+            public void success(Result<Tweet> result) {
+                mView.onUpdateTweet(result.data,position);
+            }
+
+            @Override
+            public void failure(TwitterException exception) {
+
+            }
+        });
+    }
+
+    @Override
+    public void updateUndoRetweet(long id, int postion) {
+        client.getStatusesService()
+                .unretweet(id,null)
+                .enqueue(new Callback<Tweet>() {
+                    @Override
+                    public void success(Result<Tweet> result) {
+                        mView.onUpdateTweet(result.data,postion);
+                    }
+
+                    @Override
+                    public void failure(TwitterException exception) {
+
+                    }
+                });
+    }
+
+    @Override
+    public void  updateFav(long id, int position){
+        client.getFavoriteService()
+                .create(id,null)
+                .enqueue(new Callback<Tweet>() {
+                    @Override
+                    public void success(Result<Tweet> result) {
+                            mView.onUpdateTweet(result.data,position);
+                    }
+
+                    @Override
+                    public void failure(TwitterException exception) {
+
+                    }
+                });
+    }
+
+    @Override
+    public void updateUndoFav(long id, int position) {
+        client.getFavoriteService()
+                .destroy(id,null)
+                .enqueue(new Callback<Tweet>() {
+                    @Override
+                    public void success(Result<Tweet> result) {
+                        mView.onUpdateTweet(result.data,position);
+                    }
+
+                    @Override
+                    public void failure(TwitterException exception) {
+
+                    }
+                });
+    }
+
 }

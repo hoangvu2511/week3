@@ -11,9 +11,16 @@ import java.util.List;
 public interface TimelineContract {
     interface View extends BaseView<Presenter> {
         void onGetStatusesSuccess(List<Tweet> data);
+        void onUpdateTweet(Tweet tweet,int position);
     }
 
     interface Presenter extends BasePresenter {
         void loadmore();
+
+        void updateRetweet(long id,int position);
+        void updateUndoRetweet(long id,int postion);
+
+        void updateFav(long id,int position);
+        void updateUndoFav(long id,int position);
     }
 }

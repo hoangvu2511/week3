@@ -1,7 +1,7 @@
 package com.example.soundloneteamcomp.twitterclient.util;
 
 import com.example.soundloneteamcomp.twitterclient.model.TimelineItem;
-import com.example.soundloneteamcomp.twitterclient.model.User;
+import com.example.soundloneteamcomp.twitterclient.model.User_;
 import com.twitter.sdk.android.core.models.Tweet;
 
 import org.joda.time.DateTime;
@@ -25,7 +25,7 @@ public final class TimelineConverter {
     public static List<TimelineItem> fromTweets(List<Tweet> tweets, DateTime now) {
         List<TimelineItem> timelineItems = new ArrayList<>();
         for (Tweet t : tweets) {
-            User u = new User(t.user.name, t.user.screenName, t.user.profileImageUrl);
+            User_ u = new User_(t.user.name, t.user.screenName, t.user.profileImageUrl);
             timelineItems.add(new TimelineItem(TimelineConverter.dateToAge(t.createdAt, now), t.text, u));
         }
         return timelineItems;

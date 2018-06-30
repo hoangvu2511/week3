@@ -8,7 +8,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnComment"
-        style="@style/Widget.MaterialComponents.Button.TextButton.Dialog"
+        style="@style/customMaterialButton"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
@@ -19,7 +19,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnRetweet"
-        style="@style/Widget.MaterialComponents.Button.TextButton.Dialog"
+        style="@style/customMaterialButton"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
@@ -29,7 +29,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLove"
-        style="@style/Widget.MaterialComponents.Button.TextButton.Dialog"
+        style="@style/customMaterialButton"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
@@ -39,7 +39,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.button.MaterialButton
-        style="@style/Widget.MaterialComponents.Button.TextButton.Dialog"
+        style="@style/customMaterialButton"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
@@ -47,7 +47,8 @@
         app:icon="@drawable/ic_action_share"
         android:id="@+id/btnShare"
         app:layout_constraintStart_toEndOf="@+id/btnLove"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

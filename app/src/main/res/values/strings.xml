@@ -6,11 +6,13 @@
     <string name="content_tweet">Content Tweet</string>
     <string name="img">image user</string>
     <string name="twet">Twitter</string>
-    <string name="happen">What\'s happening?</string>
+    <string name="happen">What\'s happening</string>
     <string name="cancel">Cancel Button</string>
 
     <string name="cmt">Comment</string>
     <string name="retweet">Retweet</string>
     <string name="love">Love</string>
     <string name="share">Share</string>
+
+    <string name="user_detail_transition">User transition</string>
 </resources>
