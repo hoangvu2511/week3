@@ -1,17 +1,21 @@
 package com.example.soundloneteamcomp.twitterclient.profile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.soundloneteamcomp.twitterclient.R;
-import com.example.soundloneteamcomp.twitterclient.adapter.EndlessRecyclerViewScrollListener;
 import com.example.soundloneteamcomp.twitterclient.adapter.TimelineComplexAdapter;
+import com.example.soundloneteamcomp.twitterclient.compose.ComposeTweetActivity;
 import com.example.soundloneteamcomp.twitterclient.model.TweetModel;
+import com.example.soundloneteamcomp.twitterclient.scrollListener.EndlessRecyclerViewScrollListener;
 import com.example.soundloneteamcomp.twitterclient.util.ConvertTwitterHelper;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.models.Tweet;
 
@@ -29,8 +33,9 @@ public class ProfileActivity extends AppCompatActivity implements ProfileCotract
     ImageView backgroundImg;
     Toolbar toolbar;
     ImageView fabLike;
+    FloatingActionButton comp;
     TimelineComplexAdapter adapter;
-
+    TextView textView;
     ProfileCotract.Presenter presenter;
 
     LinearLayoutManager manager;
@@ -49,7 +54,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileCotract
             finish();
         });
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         id = getIntent().getLongExtra("userId",1);
         Animation animator = AnimationUtils.loadAnimation(this, R.anim.scale_anim);
         fabLike.startAnimation(animator);
@@ -63,6 +68,12 @@ public class ProfileActivity extends AppCompatActivity implements ProfileCotract
         backgroundImg = findViewById(R.id.ivCover);
         toolbar = findViewById(R.id.toolbar);
         fabLike = findViewById(R.id.fbLike);
+        comp = findViewById(R.id.composeBtn);
+        comp.setOnClickListener(view -> {
+            startActivity(new Intent(this, ComposeTweetActivity.class));
+            overridePendingTransition(android.R.anim.slide_in_left,android.R.anim.slide_out_right );
+        });
+        textView = findViewById(R.id.name_user);
     }
 
     private void setUpRecyclerView(){
@@ -73,6 +84,14 @@ public class ProfileActivity extends AppCompatActivity implements ProfileCotract
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 presenter.loadMore(id);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView view, int dx, int dy) {
+                super.onScrolled(view, dx, dy);
+                if (dy>0)
+                    comp.hide();
+                else comp.show();
             }
         };
 
@@ -89,11 +108,16 @@ public class ProfileActivity extends AppCompatActivity implements ProfileCotract
     @Override
     public void onGetStatusesSuccess(List<TweetModel> data) {
         adapter.setData(data);
+        if (id==1){
+            Glide.with(this).load(data.get(0).user.profileImageUrlHttps)
+                    .apply(RequestOptions.circleCropTransform()).into(fabLike);
+        }
+//        textView.setText(data.get(0).user.name);
     }
 
     @Override
-    public void showInfor(Tweet tweet) {
-
+    public void showInfor(String name) {
+        textView.setText(name);
     }
 
     @Override

@@ -2,17 +2,18 @@ package com.example.soundloneteamcomp.twitterclient.timeline;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.soundloneteamcomp.twitterclient.R;
-import com.example.soundloneteamcomp.twitterclient.adapter.EndlessRecyclerViewScrollListener;
 import com.example.soundloneteamcomp.twitterclient.adapter.TimelineComplexAdapter;
 import com.example.soundloneteamcomp.twitterclient.compose.ComposeTweetActivity;
 import com.example.soundloneteamcomp.twitterclient.model.TweetModel;
 import com.example.soundloneteamcomp.twitterclient.profile.ProfileActivity;
+import com.example.soundloneteamcomp.twitterclient.scrollListener.EndlessRecyclerViewScrollListener;
 import com.example.soundloneteamcomp.twitterclient.util.ConvertTwitterHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.twitter.sdk.android.core.TwitterCore;
@@ -133,8 +134,30 @@ public class TimelineActivity extends AppCompatActivity implements TimelineContr
                 presenter.loadmore();
 
             }
+
+            @Override
+            public void onScrolled(RecyclerView view, int dx, int dy) {
+                if (dy > 0){
+                    gotoMyProfile.hide();
+                    (new Handler()).postDelayed(new Runnable() {
+                        public void run() {
+                            fab.hide();
+                        }
+                    }, 100);
+                }
+                else if (!fab.isShown()){
+                    fab.show();
+                    (new Handler()).postDelayed(new Runnable() {
+                        public void run() {
+                            gotoMyProfile.show();
+                        }
+                    }, 100);
+                }
+            }
+
         };
         rvTimeline.addOnScrollListener(scrollListener);
+
     }
 
 }

@@ -1,4 +1,4 @@
-package com.example.soundloneteamcomp.twitterclient.adapter;
+package com.example.soundloneteamcomp.twitterclient.scrollListener;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;

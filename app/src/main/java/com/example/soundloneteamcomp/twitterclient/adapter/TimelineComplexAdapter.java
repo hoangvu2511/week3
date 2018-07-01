@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -52,7 +51,7 @@ public class TimelineComplexAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     ConvertTwitterHelper convert;
     private int lastPosition = -1;
 
-    boolean isRet = false,isLove = false;
+    boolean isRet = false,isLove = false,playing = false;
 
     public TimelineComplexAdapter(Context context,@Nullable TimelineContract.Presenter presenter){
         this.listTweet = new ArrayList<>();
@@ -151,26 +150,14 @@ public class TimelineComplexAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         viewHolderVideo.time.setText(getRelativeTimeAgo(tweet.createdAt));
 
         viewHolderVideo.videoView.setVideoPath(mediaEntity.videoInfo.variants.get(0).url);
-        MediaController controller = new MediaController(ctx,true);
-        viewHolderVideo.videoView.setMediaController(controller);
-        controller.hide();
         viewHolderVideo.videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
                 mediaPlayer.setLooping(true);
-                controller.setAnchorView(viewHolderVideo.videoView);
                 mediaPlayer.seekTo(100);
+                mediaPlayer.start();
             }
         });
-        viewHolderVideo.videoView.setOnClickListener(view -> {
-            if (controller.isShowing())
-                controller.hide();
-            else{
-                viewHolderVideo.videoView.start();
-                controller.show();
-            }
-        });
-
 
         checkBtn(viewHolderVideo.btnRetweet, viewHolderVideo.btnLove,tweet);
 
@@ -320,8 +307,6 @@ public class TimelineComplexAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                              MaterialButton love, MaterialButton share, TweetModel tweet,int position){
 
         img.setOnClickListener(view->{
-            Toast.makeText(ctx,"click img",Toast.LENGTH_SHORT).show();
-
             Intent inent = new Intent(ctx,ProfileActivity.class);
             inent.putExtra("userId",tweet.user.id);
             inent.putExtra("proUrl",tweet.user.profileImageUrlHttps);
@@ -330,7 +315,6 @@ public class TimelineComplexAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         });
 
         cmt.setOnClickListener(view -> {
-            Toast.makeText(ctx,"click cmt",Toast.LENGTH_SHORT).show();
         });
 
         retweet.setOnClickListener(view->{

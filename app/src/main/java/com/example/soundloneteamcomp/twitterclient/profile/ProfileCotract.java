@@ -3,7 +3,6 @@ package com.example.soundloneteamcomp.twitterclient.profile;
 import com.example.soundloneteamcomp.twitterclient.base.BasePresenter;
 import com.example.soundloneteamcomp.twitterclient.base.BaseView;
 import com.example.soundloneteamcomp.twitterclient.model.TweetModel;
-import com.twitter.sdk.android.core.models.Tweet;
 
 import java.util.List;
 
@@ -12,7 +11,7 @@ import javax.annotation.Nullable;
 public interface ProfileCotract {
     interface View extends BaseView<ProfileCotract.Presenter> {
         void onGetStatusesSuccess(List<TweetModel> data);
-        void showInfor(Tweet tweet);
+        void showInfor(String name);
         void onUpdateTweet(TweetModel data,int position);
     }
     interface Presenter extends BasePresenter {

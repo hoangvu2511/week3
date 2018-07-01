@@ -37,6 +37,7 @@ public class ProfilePresenter implements ProfileCotract.Presenter{
                         @Override
                         public void success(Result<List<Tweet>> result) {
                             mView.onGetStatusesSuccess(new ConvertTwitterHelper().ConvertList(result.data));
+                            mView.showInfor(result.data.get(0).user.name);
                         }
 
                         @Override
@@ -53,6 +54,7 @@ public class ProfilePresenter implements ProfileCotract.Presenter{
                         @Override
                         public void success(Result<List<Tweet>> result) {
                             mView.onGetStatusesSuccess(new ConvertTwitterHelper().ConvertList(result.data));
+                            mView.showInfor(result.data.get(0).user.name);
                         }
 
                         @Override
