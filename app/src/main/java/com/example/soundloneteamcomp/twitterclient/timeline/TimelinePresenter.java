@@ -1,5 +1,6 @@
 package com.example.soundloneteamcomp.twitterclient.timeline;
 
+import com.example.soundloneteamcomp.twitterclient.util.ConvertTwitterHelper;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterApiClient;
@@ -15,6 +16,7 @@ public class TimelinePresenter implements TimelineContract.Presenter {
     TwitterApiClient client = null;
     TimelineContract.View mView;
     int count = 30;
+    ConvertTwitterHelper convert = new ConvertTwitterHelper();
 
     public TimelinePresenter(@NonNull TimelineContract.View view, TwitterSession session){
         mView= view;
@@ -72,7 +74,7 @@ public class TimelinePresenter implements TimelineContract.Presenter {
                 .retweet(id,null).enqueue(new Callback<Tweet>() {
             @Override
             public void success(Result<Tweet> result) {
-                mView.onUpdateTweet(result.data,position);
+                mView.onUpdateTweet(convert.ConvertTweet(result.data),position);
             }
 
             @Override
@@ -89,7 +91,7 @@ public class TimelinePresenter implements TimelineContract.Presenter {
                 .enqueue(new Callback<Tweet>() {
                     @Override
                     public void success(Result<Tweet> result) {
-                        mView.onUpdateTweet(result.data,postion);
+                        mView.onUpdateTweet(convert.ConvertTweet(result.data),postion);
                     }
 
                     @Override
@@ -106,7 +108,7 @@ public class TimelinePresenter implements TimelineContract.Presenter {
                 .enqueue(new Callback<Tweet>() {
                     @Override
                     public void success(Result<Tweet> result) {
-                            mView.onUpdateTweet(result.data,position);
+                        mView.onUpdateTweet(convert.ConvertTweet(result.data),position);
                     }
 
                     @Override
@@ -123,7 +125,7 @@ public class TimelinePresenter implements TimelineContract.Presenter {
                 .enqueue(new Callback<Tweet>() {
                     @Override
                     public void success(Result<Tweet> result) {
-                        mView.onUpdateTweet(result.data,position);
+                        mView.onUpdateTweet(convert.ConvertTweet(result.data),position);
                     }
 
                     @Override

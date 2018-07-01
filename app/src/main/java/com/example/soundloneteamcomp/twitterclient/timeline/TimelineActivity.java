@@ -12,10 +12,13 @@ import com.example.soundloneteamcomp.twitterclient.adapter.EndlessRecyclerViewSc
 import com.example.soundloneteamcomp.twitterclient.adapter.TimelineComplexAdapter;
 import com.example.soundloneteamcomp.twitterclient.compose.ComposeTweetActivity;
 import com.example.soundloneteamcomp.twitterclient.model.TweetModel;
+import com.example.soundloneteamcomp.twitterclient.profile.ProfileActivity;
+import com.example.soundloneteamcomp.twitterclient.util.ConvertTwitterHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.models.Tweet;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.Nullable;
@@ -30,11 +33,14 @@ public class TimelineActivity extends AppCompatActivity implements TimelineContr
     private static String TAG = TimelineActivity.class.getSimpleName();
     RecyclerView rvTimeline;
     ProgressBar loader;
-    FloatingActionButton fab;
+    FloatingActionButton fab,gotoMyProfile;
     TimelineContract.Presenter presenter;
     TimelineComplexAdapter adapter;
     SwipeRefreshLayout swipeRefreshLayout;
     EndlessRecyclerViewScrollListener scrollListener;
+
+    List<TweetModel> tweetModelList = new ArrayList<>();
+    LinearLayoutManager manager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,19 +50,27 @@ public class TimelineActivity extends AppCompatActivity implements TimelineContr
         swipeRefreshLayout = findViewById(R.id.swipeLayout);
         loader = findViewById(R.id.loader);
         fab = findViewById(R.id.fab);
+        gotoMyProfile = findViewById(R.id.gotoProfile);
         presenter = new TimelinePresenter(this, TwitterCore.getInstance().getSessionManager().getActiveSession());
 
         fab.setOnClickListener(view -> {
            startActivity(new Intent(this, ComposeTweetActivity.class));
            overridePendingTransition(android.R.anim.slide_in_left,android.R.anim.slide_out_right );
         });
+
+        gotoMyProfile.setOnClickListener(view -> {
+            startActivity(new Intent(this, ProfileActivity.class).putExtra("userId",0));
+            overridePendingTransition(android.R.anim.slide_in_left,android.R.anim.slide_out_right );
+        });
+
         setRecyclerView();
+        if (savedInstanceState == null)
+            presenter.start();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        presenter.start();
     }
 
     @Override
@@ -72,12 +86,15 @@ public class TimelineActivity extends AppCompatActivity implements TimelineContr
     @Override
     public void onGetStatusesSuccess(List<Tweet> data) {
         Log.d(TAG, "Loaded " + data.size());
-        adapter.setData(data);
+        swipeRefreshLayout.setRefreshing(false);
+        adapter.setData(new ConvertTwitterHelper().ConvertList(data));
+        tweetModelList = adapter.getData();
     }
 
     @Override
-    public void onUpdateTweet(Tweet tweet, int position) {
+    public void onUpdateTweet(TweetModel tweet, int position) {
         adapter.replaceData(tweet,position);
+        tweetModelList = adapter.getData();
     }
 
     @Override
@@ -94,13 +111,12 @@ public class TimelineActivity extends AppCompatActivity implements TimelineContr
             }
         });
 
-        LinearLayoutManager manager = new LinearLayoutManager(this);
+        manager = new LinearLayoutManager(this);
         rvTimeline.setLayoutManager(manager);
         rvTimeline.setAdapter(adapter);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                swipeRefreshLayout.setRefreshing(false);
                 presenter.start();
             }
         });
@@ -120,6 +136,5 @@ public class TimelineActivity extends AppCompatActivity implements TimelineContr
         };
         rvTimeline.addOnScrollListener(scrollListener);
     }
-
 
 }

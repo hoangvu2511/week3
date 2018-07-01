@@ -89,4 +89,5 @@ public class ComposeTweetActivity extends AppCompatActivity implements ComposeCo
         name.setText(user.name);
         screenName.setText("@"+user.screenName);
     }
+
 }

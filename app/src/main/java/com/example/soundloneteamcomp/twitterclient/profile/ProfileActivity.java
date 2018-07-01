@@ -8,7 +8,10 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.soundloneteamcomp.twitterclient.R;
+import com.example.soundloneteamcomp.twitterclient.adapter.EndlessRecyclerViewScrollListener;
 import com.example.soundloneteamcomp.twitterclient.adapter.TimelineComplexAdapter;
+import com.example.soundloneteamcomp.twitterclient.model.TweetModel;
+import com.example.soundloneteamcomp.twitterclient.util.ConvertTwitterHelper;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.models.Tweet;
 
@@ -29,6 +32,12 @@ public class ProfileActivity extends AppCompatActivity implements ProfileCotract
     TimelineComplexAdapter adapter;
 
     ProfileCotract.Presenter presenter;
+
+    LinearLayoutManager manager;
+    EndlessRecyclerViewScrollListener scrollListener ;
+
+    long id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,12 +50,12 @@ public class ProfileActivity extends AppCompatActivity implements ProfileCotract
         });
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        id = getIntent().getLongExtra("userId",1);
         Animation animator = AnimationUtils.loadAnimation(this, R.anim.scale_anim);
         fabLike.startAnimation(animator);
 
         presenter = new ProfilePresenter(this, TwitterCore.getInstance().getSessionManager().getActiveSession());
-        presenter.getTimeline(getIntent().getLongExtra("userId",1));
+        presenter.getTimeline(id);
     }
 
     private void setId(){
@@ -57,18 +66,28 @@ public class ProfileActivity extends AppCompatActivity implements ProfileCotract
     }
 
     private void setUpRecyclerView(){
-        rvReview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        rvReview.setLayoutManager(manager);
+
+        scrollListener = new EndlessRecyclerViewScrollListener(manager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                presenter.loadMore(id);
+            }
+        };
+
         List<Tweet> listTweet = new ArrayList<>();
         adapter = new TimelineComplexAdapter(this,null);
-        adapter.setData(listTweet);
+        adapter.setData(new ConvertTwitterHelper().ConvertList(listTweet));
         rvReview.setAdapter(adapter);
+        rvReview.addOnScrollListener(scrollListener);
         loadImg(backgroundImg);
         loadProfile(fabLike);
     }
 
 
     @Override
-    public void onGetStatusesSuccess(List<Tweet> data) {
+    public void onGetStatusesSuccess(List<TweetModel> data) {
         adapter.setData(data);
     }
 
@@ -76,10 +95,17 @@ public class ProfileActivity extends AppCompatActivity implements ProfileCotract
     public void showInfor(Tweet tweet) {
 
     }
+
+    @Override
+    public void onUpdateTweet(TweetModel data,int position) {
+        adapter.replaceData(data,position);
+    }
+
     private void loadImg(ImageView imageView){
         Glide.with(this).load(getIntent().getStringExtra("backUrl"))
                 .apply(RequestOptions.placeholderOf(R.drawable.ic_launcher_background)).into(imageView);
     }
+
     private void loadProfile(ImageView imageView){
         Glide.with(this).load(getIntent().getStringExtra("proUrl"))
                 .apply(RequestOptions.circleCropTransform()).into(imageView);

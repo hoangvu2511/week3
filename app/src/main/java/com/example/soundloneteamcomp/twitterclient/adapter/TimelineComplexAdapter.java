@@ -19,6 +19,7 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.soundloneteamcomp.twitterclient.R;
 import com.example.soundloneteamcomp.twitterclient.model.TweetModel;
@@ -28,8 +29,6 @@ import com.example.soundloneteamcomp.twitterclient.timeline.TimelineContract;
 import com.example.soundloneteamcomp.twitterclient.util.ConvertTwitterHelper;
 import com.google.android.material.button.MaterialButton;
 import com.twitter.sdk.android.core.models.MediaEntity;
-import com.twitter.sdk.android.core.models.Tweet;
-import com.twitter.sdk.android.tweetui.internal.MultiTouchImageView;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,6 +41,7 @@ import javax.annotation.Nullable;
 
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 
 public class TimelineComplexAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -61,14 +61,19 @@ public class TimelineComplexAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         this.presenterTime = presenter;
     }
 
-    public void setData(List<Tweet> timelineItems){
-        this.listTweet = convert.ConvertList(timelineItems);
+    public void setData(List<TweetModel> timelineItems){
+        this.listTweet = timelineItems;
         notifyDataSetChanged();
     }
 
-    public void replaceData(Tweet tweet,int position){
-        this.listTweet.set(position,convert.ConvertTweet(tweet));
+    public void replaceData(TweetModel tweet,int position){
+        this.listTweet.set(position,tweet);
         notifyDataSetChanged();
+    }
+
+    public List<TweetModel> getData(){
+        List<TweetModel> tweetModels = this.listTweet;
+        return tweetModels;
     }
 
     public void setListener(ItemClickListener listener){
@@ -148,19 +153,22 @@ public class TimelineComplexAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         viewHolderVideo.videoView.setVideoPath(mediaEntity.videoInfo.variants.get(0).url);
         MediaController controller = new MediaController(ctx,true);
         viewHolderVideo.videoView.setMediaController(controller);
+        controller.hide();
         viewHolderVideo.videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
                 mediaPlayer.setLooping(true);
                 controller.setAnchorView(viewHolderVideo.videoView);
-                mediaPlayer.start();
+                mediaPlayer.seekTo(100);
             }
         });
         viewHolderVideo.videoView.setOnClickListener(view -> {
             if (controller.isShowing())
                 controller.hide();
-            else
+            else{
+                viewHolderVideo.videoView.start();
                 controller.show();
+            }
         });
 
 
@@ -186,17 +194,27 @@ public class TimelineComplexAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             normalView2.btnLove.setText(String.valueOf(tweet.favoriteCount));
 
         loadProfileImg(ctx,normalView2.imgV,user.profileImageUrlHttps);
-        loadImg(ctx,normalView2.imgContent,tweet.entities.media.get(0).mediaUrlHttps);
+
+//        loadImg(ctx,normalView2.imgContent,tweet.entities.media.get(0).mediaUrlHttps);
 
         normalView2.imgContent.setOnClickListener(view -> {
             Log.e("Error","imgSSSSSS");
 
         });
         checkBtn(normalView2.btnRetweet, normalView2.btnLove,tweet);
-
-//        for (MediaEntity media : tweet.entities.media){
-//            loadImg(ctx,normalView2.touchImageView,media.mediaUrlHttps);
-//        }
+        int count = 0;
+        List<String> url = new ArrayList<>();
+        for (MediaEntity entity : tweet.extendedEntities.media){
+            if (count>4)
+                break;
+            url.add(entity.mediaUrlHttps);
+            count++;
+        }
+        ImgAdapter adapter = new ImgAdapter(ctx);
+        StaggeredGridLayoutManager manager = new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
+        normalView2.rvImg.setLayoutManager(manager);
+        normalView2.rvImg.setAdapter(adapter);
+        adapter.setUrl(url);
     }
 
     private void configureNormal(ViewHolderNormal normalView, int position) {
@@ -253,8 +271,6 @@ public class TimelineComplexAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     }
 
 
-
-
     private void setlink(TextView view){
         new PatternEditableBuilder().
                 addPattern(Pattern.compile("\\@(\\w+)"), Color.BLUE,
@@ -287,7 +303,10 @@ public class TimelineComplexAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     }
 
     private void loadImg(Context ctx,ImageView view, String url){
-        Glide.with(ctx).load(url).into(view);
+        Glide.with(ctx)
+                .load(url)
+                .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
+                .into(view);
     }
 
     private void loadProfileImg(Context ctx,ImageView view, String url){
@@ -383,25 +402,16 @@ public class TimelineComplexAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         TweetModel model = listTweet.get(position);
         int numEntity = model.entities.media.size();
         int numExtendEntity = model.extendedEntities.media.size();
-//        switch (numMedia){
-//            case 0:
-//                return 2;
-//            case 1:
-//                MediaEntity media = listTweet.get(position).extendedEntities.media.get(0);
-//                String type = media.type;
-//                if (type.equals("video"))
-//                    return 3;
-//                return 1;
-//            default:
-//                return 4;
-//        }
+
         if (numEntity == 0)
             return 2;
         else if(numEntity==numExtendEntity && numEntity==1 && model.extendedEntities.media.get(0).type.equals("photo"))
             return 1;
         else if (model.extendedEntities.media.get(0).type.equals("video") && numEntity == 1)
             return 3;
-        return 4;
+        else if(numExtendEntity > 1 && model.extendedEntities.media.get(0).type.equals("photo"))
+            return 4;
+        return 5;
 
     }
 
@@ -474,7 +484,7 @@ public class TimelineComplexAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         TextView name,userName,time,content;
         MaterialButton btnCmt,btnRetweet,btnLove,btnShare;
         View include;
-        MultiTouchImageView touchImageView;
+        RecyclerView rvImg;
 
         public ViewHolderImgsAlot(View viewDefault) {
             super(viewDefault);
@@ -495,7 +505,7 @@ public class TimelineComplexAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             btnLove = include.findViewById(R.id.btnLove);
             btnShare = include.findViewById(R.id.btnShare);
 
-            touchImageView = itemView.findViewById(R.id.multiImage);
+            rvImg = itemView.findViewById(R.id.multiImage);
         }
     }
 

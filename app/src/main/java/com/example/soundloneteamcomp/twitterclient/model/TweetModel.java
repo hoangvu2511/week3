@@ -33,7 +33,7 @@ import java.util.List;
  * generically as "status updates." Tweets can be embedded, replied to, favorited, unfavorited and
  * deleted.
  */
-public class TweetModel implements Identifiable {
+public class TweetModel implements  Identifiable{
     public long INVALID_ID = -1L;
 
 

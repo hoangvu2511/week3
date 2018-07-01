@@ -22,14 +22,13 @@ import com.twitter.sdk.android.core.models.Identifiable;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.core.models.UserEntities;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
  * Users can be anyone or anything. They tweet, follow, create lists, have a home_timeline, can be
  * mentioned, and can be looked up in bulk.
  */
-public class UserModel implements Serializable, Identifiable {
+public class UserModel implements Identifiable {
     private  long serialVersionUID = 4663450696842173958L;
     public  long INVALID_ID = -1L;
 

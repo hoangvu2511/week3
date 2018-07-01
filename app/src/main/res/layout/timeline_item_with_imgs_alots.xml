@@ -109,15 +109,14 @@
         app:layout_constraintGuide_percent="0.72"
         app:layout_constraintStart_toStartOf="parent" />
 
-
-    <com.twitter.sdk.android.tweetui.internal.MultiTouchImageView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/multiImage"
         android:layout_width="0dp"
         android:layout_height="0dp"
+
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:src="@drawable/tweetter"
         app:layout_constraintBottom_toTopOf="@+id/include"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView"
